@@ -1,71 +1,67 @@
-import React from 'react';
-import { View, Text, Pressable } from 'react-native';
-import { Heart, Chrome } from 'lucide-react-native';
+import React, { useState } from 'react';
+import { View, Text, Pressable, ActivityIndicator, Platform } from 'react-native';
 import { Screen } from '@/components/layout/Screen';
-import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function LoginScreen() {
-  function handleLogin() {
-    // Por enquanto apenas um log para testar o fluxo
-    console.log('Login com Google acionado');
+  const { signInWithGoogle, loading } = useAuth();
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleGoogleLogin() {
+    try {
+      setError(null);
+      await signInWithGoogle();
+    } catch (err) {
+      console.error('[LoginScreen] Erro no login:', err);
+      setError(err instanceof Error ? err.message : 'Erro ao fazer login');
+    }
   }
 
   return (
-    <Screen withHorizontalPadding={false} className="items-center">
-      <View className="flex-1 w-full items-center justify-center px-8">
-        <View
-          className="mb-8 h-24 w-24 items-center justify-center rounded-3xl bg-sf-primary"
-          style={{
-            shadowColor: '#000',
-            shadowOpacity: 0.16,
-            shadowOffset: { width: 0, height: 14 },
-            shadowRadius: 28,
-            elevation: 4,
-          }}
+    <Screen className="items-center justify-center px-6">
+      {/* Logo / Título */}
+      <View className="mb-12 items-center">
+        <Text className="text-4xl font-bold text-sf-primary">Share Finance</Text>
+        <Text className="mt-2 text-sf-muted text-center">
+          Gerencie suas finanças compartilhadas de forma simples
+        </Text>
+      </View>
+
+      {/* Área de Login */}
+      <View className="w-full max-w-sm">
+        {/* Botão Google */}
+        <Pressable
+          onPress={handleGoogleLogin}
+          disabled={loading}
+          className="flex-row items-center justify-center rounded-xl bg-white border border-gray-300 px-6 py-4 shadow-sm active:bg-gray-50 disabled:opacity-50"
         >
-          <Heart size={40} color="#ffffff" strokeWidth={2.4} />
-        </View>
+          {loading ? (
+            <ActivityIndicator size="small" color="#007C82" />
+          ) : (
+            <>
+              {/* Ícone do Google (emoji como fallback simples) */}
+              <Text className="mr-3 text-xl">🔐</Text>
+              <Text className="text-base font-medium text-gray-700">
+                Entrar com Google
+              </Text>
+            </>
+          )}
+        </Pressable>
 
-        <Text className="text-[28px] font-extrabold text-sf-text mb-2">
-          ShareFinance
-        </Text>
+        {/* Mensagem de erro */}
+        {error && (
+          <View className="mt-4 rounded-lg bg-red-50 p-4">
+            <Text className="text-red-600 text-center">{error}</Text>
+          </View>
+        )}
 
-        <Text className="text-center text-[15px] leading-6 text-sf-muted px-6">
-          Divida os gastos com seu amor de forma simples e sem estresse
-        </Text>
-      </View>
-
-      <View className="w-full px-6 mb-8">
-        <Button
-          variant="outline"
-          label="Entrar com Google"
-          onPress={handleLogin}
-          className="w-full rounded-[999px] py-4 shadow-soft-lg"
-          leftIcon={
-            <View className="h-6 w-6 items-center justify-center rounded-full bg-white">
-              <Chrome size={18} color="#EA4335" />
-            </View>
-          }
-        />
-      </View>
-
-      <View className="w-full px-10 pb-6">
-        <Text className="text-center text-xs leading-5 text-sf-muted">
+        {/* Termos */}
+        <Text className="mt-8 text-center text-xs text-sf-muted">
           Ao continuar, você concorda com nossos{' '}
-          <Pressable onPress={() => console.log('Termos de Uso')}>
-            <Text className="text-xs font-semibold text-sf-primary">
-              Termos de Uso
-            </Text>
-          </Pressable>{' '}
-          <Text className="text-xs text-sf-muted">e </Text>
-          <Pressable onPress={() => console.log('Política de Privacidade')}>
-            <Text className="text-xs font-semibold text-sf-primary">
-              Política de Privacidade
-            </Text>
-          </Pressable>
+          <Text className="text-sf-primary">Termos de Uso</Text> e{' '}
+          <Text className="text-sf-primary">Política de Privacidade</Text>
         </Text>
       </View>
     </Screen>
   );
 }
-

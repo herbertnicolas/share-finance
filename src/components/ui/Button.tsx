@@ -20,6 +20,7 @@ export function Button({
   variant = 'primary',
   leftIcon,
   className,
+  disabled,
   ...touchableProps
 }: ButtonProps) {
   const baseClasses =
@@ -37,10 +38,18 @@ export function Button({
     ghost: 'text-sf-primary',
   };
 
+  const disabledClasses = disabled ? 'opacity-50' : '';
+
   return (
     <TouchableOpacity
-      activeOpacity={0.85}
-      className={cn(baseClasses, variantClasses[variant], className)}
+      activeOpacity={disabled ? 1 : 0.85}
+      disabled={disabled}
+      className={cn(
+        baseClasses,
+        variantClasses[variant],
+        disabledClasses,
+        className,
+      )}
       {...touchableProps}
     >
       {leftIcon ? (
@@ -50,6 +59,7 @@ export function Button({
         className={cn(
           'text-base font-semibold',
           textVariantClasses[variant],
+          disabled && 'opacity-70',
         )}
       >
         {label}
@@ -57,4 +67,3 @@ export function Button({
     </TouchableOpacity>
   );
 }
-
