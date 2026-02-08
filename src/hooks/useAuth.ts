@@ -21,6 +21,10 @@ export function useAuth() {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      console.log('[useAuth] Sessão inicial verificada:', {
+        hasSession: !!session,
+        userEmail: session?.user?.email,
+      });
     });
 
     // Escuta mudanças na autenticação
